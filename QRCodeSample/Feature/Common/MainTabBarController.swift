@@ -18,7 +18,7 @@ class MainTabBarController: UITabBarController {
     private func setUpTab() {
         let qrCodeListVC = QRCodeListViewController()
         qrCodeListVC.tabBarItem = UITabBarItem(title: "一覧", image: UIImage(systemName: "list.bullet"), tag: 0)
-        let qrCodeCreatingVC = QRCodeCreatingViewController()
+        let qrCodeCreatingVC = QRCodeGeneratorViewController()
         qrCodeCreatingVC.tabBarItem = UITabBarItem(title: "生成", image: UIImage(systemName: "qrcode"), tag: 0)
         let qrCodeReadingVC = QRCodeReadingViewController()
         qrCodeReadingVC.tabBarItem = UITabBarItem(title: "読み取り", image: UIImage(systemName: "qrcode.viewfinder"), tag: 0)

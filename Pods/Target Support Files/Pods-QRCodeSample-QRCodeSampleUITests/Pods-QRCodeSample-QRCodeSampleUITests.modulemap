@@ -1,0 +1,6 @@
+framework module Pods_QRCodeSample_QRCodeSampleUITests {
+  umbrella header "Pods-QRCodeSample-QRCodeSampleUITests-umbrella.h"
+
+  export *
+  module * { export * }
+}
