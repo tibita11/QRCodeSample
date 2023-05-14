@@ -16,7 +16,6 @@ class QRCodeGeneratorViewController: UIViewController {
     @IBOutlet weak var saveButton: UIButton! {
         didSet {
             // 画像位置を変更
-            saveButton.configuration = .filled()
             var config = saveButton.configuration
             config?.imagePlacement = .top
             saveButton.configuration = config
@@ -25,7 +24,6 @@ class QRCodeGeneratorViewController: UIViewController {
     @IBOutlet weak var shareButton: UIButton! {
         didSet {
             // 画像位置を変更
-            shareButton.configuration = .filled()
             var config = shareButton.configuration
             config?.imagePlacement = .top
             shareButton.configuration = config
@@ -46,11 +44,19 @@ class QRCodeGeneratorViewController: UIViewController {
         viewModel.output.qrCodeButtonIsEnabledDriver
             .drive(qrCodeButton.rx.isEnabled)
             .disposed(by: disposeBag)
+        // QRCodeImage
+        viewModel.output.qrCodeImageDriver
+            .drive(qrCodeImageView.rx.image)
+            .disposed(by: disposeBag)
     }
     
     // MARK: - Action
 
     @IBAction func tapQRCodeButton(_ sender: Any) {
-        print("生成します。")
+        viewModel.generateQRCode(value: valueTextField.text!)
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        view.endEditing(true)
     }
 }

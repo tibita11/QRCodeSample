@@ -31,20 +31,32 @@
                         <constraint firstAttribute="height" constant="250" id="i9u-PD-KtQ"/>
                     </constraints>
                 </imageView>
-                <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="20" translatesAutoresizingMaskIntoConstraints="NO" id="MD9-zO-JwB">
-                    <rect key="frame" x="70" y="601" width="253" height="28"/>
+                <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="40" translatesAutoresizingMaskIntoConstraints="NO" id="MD9-zO-JwB">
+                    <rect key="frame" x="70" y="601" width="253" height="40"/>
                     <subviews>
                         <button opaque="NO" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lul-ci-zuP">
-                            <rect key="frame" x="0.0" y="0.0" width="116.66666666666667" height="28"/>
-                            <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                            <rect key="frame" x="0.0" y="0.0" width="106.66666666666667" height="40"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="40" id="qJs-Gx-Sue"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" type="system" pointSize="13"/>
                             <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                             <state key="normal" title="保存" image="square.and.arrow.down" catalog="system"/>
+                            <buttonConfiguration key="configuration" style="gray" image="square.and.arrow.down" catalog="system" title="保存">
+                                <fontDescription key="titleFontDescription" type="system" pointSize="13"/>
+                            </buttonConfiguration>
                         </button>
                         <button opaque="NO" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2Gr-LV-L35">
-                            <rect key="frame" x="136.66666666666666" y="0.0" width="116.33333333333334" height="28"/>
-                            <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                            <rect key="frame" x="146.66666666666666" y="0.0" width="106.33333333333334" height="40"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="40" id="xCK-TD-qBi"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" type="system" pointSize="13"/>
                             <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                             <state key="normal" title="シェア" image="square.and.arrow.up" catalog="system"/>
+                            <buttonConfiguration key="configuration" style="gray" image="square.and.arrow.up" catalog="system" title="シェア">
+                                <fontDescription key="titleFontDescription" type="system" pointSize="13"/>
+                            </buttonConfiguration>
                         </button>
                     </subviews>
                 </stackView>
