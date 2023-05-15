@@ -45,6 +45,9 @@
                             <buttonConfiguration key="configuration" style="gray" image="square.and.arrow.down" catalog="system" title="保存">
                                 <fontDescription key="titleFontDescription" type="system" pointSize="13"/>
                             </buttonConfiguration>
+                            <connections>
+                                <action selector="tapSaveButton:" destination="-1" eventType="touchUpInside" id="vpv-pr-E7E"/>
+                            </connections>
                         </button>
                         <button opaque="NO" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2Gr-LV-L35">
                             <rect key="frame" x="146.66666666666666" y="0.0" width="106.33333333333334" height="40"/>

@@ -48,6 +48,12 @@ class QRCodeGeneratorViewController: UIViewController {
         viewModel.output.qrCodeImageDriver
             .drive(qrCodeImageView.rx.image)
             .disposed(by: disposeBag)
+        // アラート表示
+        viewModel.output.alertPresentationDriver
+            .drive(onNext: { [weak self] alertController in
+                self?.present(alertController, animated: true)
+            })
+            .disposed(by: disposeBag)
     }
     
     // MARK: - Action
@@ -55,6 +61,12 @@ class QRCodeGeneratorViewController: UIViewController {
     @IBAction func tapQRCodeButton(_ sender: Any) {
         viewModel.generateQRCode(value: valueTextField.text!)
     }
+    
+    @IBAction func tapSaveButton(_ sender: Any) {
+        guard let image = qrCodeImageView.image else { return }
+        viewModel.saveImageToAlbum(image: image)
+    }
+    
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         view.endEditing(true)
