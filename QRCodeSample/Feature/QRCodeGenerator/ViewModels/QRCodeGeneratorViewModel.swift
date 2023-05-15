@@ -87,10 +87,12 @@ class QRCodeGeneratorViewModel: QRCodeGeneratorViewModelType {
         } completionHandler: { [weak self] success, error in
             guard let self = self else { return }
             // アラートをUIに表示する
-            if success {
-                self.alertPresentationRelay.accept(self.createAlert())
-            } else if let error = error {
-                self.alertPresentationRelay.accept(self.createAlert(message: error.localizedDescription))
+            DispatchQueue.main.async {
+                if success {
+                    self.alertPresentationRelay.accept(self.createAlert())
+                } else if let error = error {
+                    self.alertPresentationRelay.accept(self.createAlert(message: error.localizedDescription))
+                }
             }
         }
     }
