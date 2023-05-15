@@ -10,6 +10,7 @@ import RxSwift
 import RxCocoa
 import CoreImage
 import Photos
+import LinkPresentation
 
 struct QRCodeGeneratorViewModelInput {
     let valueTextFieldObserver: Observable<String?>
@@ -19,6 +20,7 @@ protocol QRCodeGeneratorViewModelOutput {
     var qrCodeButtonIsEnabledDriver: Driver<Bool> { get }
     var qrCodeImageDriver: Driver<UIImage> { get }
     var alertPresentationDriver: Driver<UIAlertController> { get }
+    var activityPresentationDriver: Driver<UIActivityViewController> { get }
 }
 
 protocol QRCodeGeneratorViewModelType {
@@ -32,6 +34,7 @@ class QRCodeGeneratorViewModel: QRCodeGeneratorViewModelType {
     private let qrCodeButtonIsEnabledRelay = PublishRelay<Bool>()
     private let qrCodeImageRelay = PublishRelay<UIImage>()
     private let alertPresentationRelay = PublishRelay<UIAlertController>()
+    private let activityPresentationRelay = PublishRelay<UIActivityViewController>()
     
     func setUp(input: QRCodeGeneratorViewModelInput) {
         // 生成ボタンがタップ可能であるかを判断する
@@ -123,6 +126,18 @@ class QRCodeGeneratorViewModel: QRCodeGeneratorViewModelType {
         return alertController
     }
     
+    func shareImage(image: UIImage) {
+        // シェア画面を表示する
+        let message = "[QRCodeSample] QRコードを読み込みグループを追加しましょう！"
+        let linkMetaData = LPLinkMetadata()
+        linkMetaData.title = message
+        linkMetaData.imageProvider = NSItemProvider(object: image)
+        let itemSource = ShareActivityItemSource(linkMetaData: linkMetaData)
+        let shareItems = [image, message, itemSource] as [Any]
+        let controller = UIActivityViewController(activityItems: shareItems, applicationActivities: nil)
+        activityPresentationRelay.accept(controller)
+    }
+    
     
 }
 
@@ -142,4 +157,34 @@ extension QRCodeGeneratorViewModel: QRCodeGeneratorViewModelOutput {
         alertPresentationRelay.asDriver(onErrorDriveWith: .empty())
     }
     
+    var activityPresentationDriver: Driver<UIActivityViewController> {
+        activityPresentationRelay.asDriver(onErrorDriveWith: .empty())
+    }
+    
+    
 }
+
+
+// MARK: - ShareActivityItemSource
+
+class ShareActivityItemSource: NSObject, UIActivityItemSource {
+    var linkMetaData = LPLinkMetadata()
+
+    init(linkMetaData: LPLinkMetadata) {
+        self.linkMetaData = linkMetaData
+        super.init()
+    }
+
+    func activityViewControllerPlaceholderItem(_ activityViewController: UIActivityViewController) -> Any {
+        return ""
+    }
+
+    func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
+        return nil
+    }
+
+    func activityViewControllerLinkMetadata(_ activityViewController: UIActivityViewController) -> LPLinkMetadata? {
+        return linkMetaData
+    }
+}
+

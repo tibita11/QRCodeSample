@@ -46,12 +46,22 @@ class QRCodeGeneratorViewController: UIViewController {
             .disposed(by: disposeBag)
         // QRCodeImage
         viewModel.output.qrCodeImageDriver
-            .drive(qrCodeImageView.rx.image)
+            .drive(onNext: { [weak self] image in
+                self?.qrCodeImageView.image = image
+                self?.saveButton.isEnabled = true
+                self?.shareButton.isEnabled = true
+            })
             .disposed(by: disposeBag)
         // アラート表示
         viewModel.output.alertPresentationDriver
             .drive(onNext: { [weak self] alertController in
                 self?.present(alertController, animated: true)
+            })
+            .disposed(by: disposeBag)
+        // シェア画面表示
+        viewModel.output.activityPresentationDriver
+            .drive(onNext: { [weak self] controller in
+                self?.present(controller, animated: true)
             })
             .disposed(by: disposeBag)
     }
@@ -65,6 +75,11 @@ class QRCodeGeneratorViewController: UIViewController {
     @IBAction func tapSaveButton(_ sender: Any) {
         guard let image = qrCodeImageView.image else { return }
         viewModel.saveImageToAlbum(image: image)
+    }
+    
+    @IBAction func tapShareButton(_ sender: Any) {
+        guard let image = qrCodeImageView.image else { return }
+        viewModel.shareImage(image: image)
     }
     
     
