@@ -37,6 +37,7 @@
                     <subviews>
                         <button opaque="NO" contentMode="scaleAspectFit" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lul-ci-zuP">
                             <rect key="frame" x="0.0" y="0.0" width="106.66666666666667" height="40"/>
+                            <accessibility key="accessibilityConfiguration" identifier="saveButton"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="40" id="qJs-Gx-Sue"/>
                             </constraints>

@@ -78,10 +78,9 @@ class QRCodeGeneratorViewModel: QRCodeGeneratorViewModelType {
     }
     
     /// 画像がアルバムに正しく保存できたかを判断する
-    /// 保存処理をテストするためpublic
     func checkStorageStatus(image: UIImage) async -> StorageStatus? {
         var storageStatus:StorageStatus? = nil
-        let status = PHPhotoLibrary.authorizationStatus(for: .addOnly)
+        let status = PHPhotoLibrary.authorizationStatus(for: .readWrite)
         switch status {
         case .authorized:
             // 許可の場合に保存結果を取得
@@ -95,7 +94,7 @@ class QRCodeGeneratorViewModel: QRCodeGeneratorViewModelType {
             storageStatus = .goSettings
         case .notDetermined:
             // 許可の場合に保存結果を取得
-            let status = await PHPhotoLibrary.requestAuthorization(for: .addOnly)
+            let status = await PHPhotoLibrary.requestAuthorization(for: .readWrite)
             if status == .authorized {
                 let error = await saveImage(image: image)
                 if let error = error {
