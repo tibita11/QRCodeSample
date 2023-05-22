@@ -8,26 +8,51 @@
 import XCTest
 
 final class QRCodeSampleUITests: XCTestCase {
-
-    override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-
-        // In UI tests it is usually best to stop immediately when a failure occurs.
+    
+    let app = XCUIApplication()
+    
+    override func setUp() {
         continueAfterFailure = false
-
-        // In UI tests it’s important to set the initial state - such as interface orientation - required for your tests before they run. The setUp method is a good place to do this.
+        app.launch()
     }
-
+    
     override func tearDownWithError() throws {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
-
-    func testExample() throws {
-        // UI tests must launch the application that they test.
-        let app = XCUIApplication()
-        app.launch()
-
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+    
+    func testShareImage() {
+        // タブ移動
+        let tabBar = app.tabBars.firstMatch
+        let tabIndex = 1
+        let tab = tabBar.buttons.element(boundBy: tabIndex)
+        tab.tap()
+        // 指定のViewControllerが表示されていること
+        let qrCodeGeneratorViewController = app.otherElements["qrCodeGeneratorViewController"]
+        XCTAssertTrue(qrCodeGeneratorViewController.waitForExistence(timeout: 3))
+        // UI要素の検索
+        let qrCodeValueTextField = app.textFields["qrCodeValueTextField"]
+        let qrCodeButton = app.buttons["qrCodeButton"]
+        let shareButton = app.buttons["shareButton"]
+        // UI要素の検証
+        XCTAssert(qrCodeValueTextField.exists)
+        XCTAssert(qrCodeButton.exists)
+        XCTAssertFalse(qrCodeButton.isEnabled)
+        XCTAssert(shareButton.exists)
+        XCTAssertFalse(shareButton.isEnabled)
+        // テキスト入力
+        qrCodeValueTextField.tap()
+        qrCodeValueTextField.typeText("テスト")
+        qrCodeValueTextField.typeText("\n")
+        // ボタンがタップ可能であること
+        XCTAssert(qrCodeButton.isEnabled)
+        qrCodeButton.tap()
+        // シェアボタンがタップ可能であること
+        XCTAssert(shareButton.isEnabled)
+        shareButton.tap()
+        // ActivityViewControllerが表示されていること
+        let activityListView = app.otherElements.element(matching: .other, identifier: "ActivityListView")
+        XCTAssert(activityListView.waitForExistence(timeout: 3))
+        
     }
 
     func testLaunchPerformance() throws {

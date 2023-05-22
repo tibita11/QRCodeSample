@@ -6,6 +6,7 @@
 //
 
 import XCTest
+import Photos
 @testable import QRCodeSample
 
 final class QRCodeSampleTests: XCTestCase {
@@ -17,6 +18,12 @@ final class QRCodeSampleTests: XCTestCase {
     override func tearDownWithError() throws {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
+    
+    func testGenerateQRCode() {
+        let image = QRCodeGeneratorViewModel().generateQRCode(value: "テスト")
+        XCTAssertNotNil(image)
+    }
+    
 
     func testExample() throws {
         // This is an example of a functional test case.

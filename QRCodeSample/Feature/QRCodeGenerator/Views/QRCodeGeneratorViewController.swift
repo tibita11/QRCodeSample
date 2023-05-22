@@ -44,14 +44,6 @@ class QRCodeGeneratorViewController: UIViewController {
         viewModel.output.qrCodeButtonIsEnabledDriver
             .drive(qrCodeButton.rx.isEnabled)
             .disposed(by: disposeBag)
-        // QRCodeImage
-        viewModel.output.qrCodeImageDriver
-            .drive(onNext: { [weak self] image in
-                self?.qrCodeImageView.image = image
-                self?.saveButton.isEnabled = true
-                self?.shareButton.isEnabled = true
-            })
-            .disposed(by: disposeBag)
         // アラート表示
         viewModel.output.alertPresentationDriver
             .drive(onNext: { [weak self] alertController in
@@ -69,7 +61,9 @@ class QRCodeGeneratorViewController: UIViewController {
     // MARK: - Action
 
     @IBAction func tapQRCodeButton(_ sender: Any) {
-        viewModel.generateQRCode(value: valueTextField.text!)
+        let image = viewModel.generateQRCode(value: valueTextField.text!)
+        changeIsEnabled(bool: image != nil)
+        qrCodeImageView.image = image
     }
     
     @IBAction func tapSaveButton(_ sender: Any) {
@@ -85,5 +79,10 @@ class QRCodeGeneratorViewController: UIViewController {
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         view.endEditing(true)
+    }
+    
+    private func changeIsEnabled(bool: Bool) {
+        saveButton.isEnabled = bool
+        shareButton.isEnabled = bool
     }
 }

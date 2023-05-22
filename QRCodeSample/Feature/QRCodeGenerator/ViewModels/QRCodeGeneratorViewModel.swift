@@ -18,7 +18,6 @@ struct QRCodeGeneratorViewModelInput {
 
 protocol QRCodeGeneratorViewModelOutput {
     var qrCodeButtonIsEnabledDriver: Driver<Bool> { get }
-    var qrCodeImageDriver: Driver<UIImage> { get }
     var alertPresentationDriver: Driver<UIAlertController> { get }
     var activityPresentationDriver: Driver<UIActivityViewController> { get }
 }
@@ -32,7 +31,6 @@ class QRCodeGeneratorViewModel: QRCodeGeneratorViewModelType {
     var output: QRCodeGeneratorViewModelOutput! { return self }
     private let disposeBag = DisposeBag()
     private let qrCodeButtonIsEnabledRelay = PublishRelay<Bool>()
-    private let qrCodeImageRelay = PublishRelay<UIImage>()
     private let alertPresentationRelay = PublishRelay<UIAlertController>()
     private let activityPresentationRelay = PublishRelay<UIActivityViewController>()
     
@@ -46,58 +44,83 @@ class QRCodeGeneratorViewModel: QRCodeGeneratorViewModelType {
             .disposed(by: disposeBag)
     }
     
-    func generateQRCode(value: String) {
-        // UIに表示するQRCodeを生成し、反映する
-        guard let data = value.data(using: .utf8) else { return }
-        let qr = CIFilter(name: "CIQRCodeGenerator", parameters: ["inputMessage" : data, "inputCorrectionLevel" : "M"])!
-        let transform = CGAffineTransform(scaleX: 10, y: 10)
-        let ciImage = qr.outputImage!.transformed(by: transform)
-        let context = CIContext()
-        let cgImage = context.createCGImage(ciImage, from: ciImage.extent)!
-        let uiImage = UIImage(cgImage: cgImage)
-        qrCodeImageRelay.accept(uiImage)
+    func generateQRCode(value: String) -> UIImage? {
+        // QRコード生成
+        guard let data = value.data(using: .utf8),
+              let qr = CIFilter(name: "CIQRCodeGenerator", parameters: ["inputMessage" : data, "inputCorrectionLevel" : "M"]),
+              let outputImage = qr.outputImage else { return nil }
+        // 画像拡大
+        let ciImage = outputImage.transformed(by: CGAffineTransform(scaleX: 10, y: 10))
+        // アルバム保存のためCGImageに変換
+        guard let cgImage = CIContext().createCGImage(ciImage, from: ciImage.extent) else {
+            return nil
+        }
+        
+        return UIImage(cgImage: cgImage)
     }
     
+    /// 保存実行後にUIに反映する
     func saveImageToAlbum(image: UIImage) {
-        // 保存後に処理結果をアラートにて表示
-        PHPhotoLibrary.requestAuthorization(for: .addOnly) { [weak self] status in
-            guard let self = self else { return }
-            
+        Task {
+            let status = await checkStorageStatus(image: image)
+            guard let status = status else { return }
+            var alertController: UIAlertController!
             switch status {
-            case .authorized:
-                self.saveImage(image: image)
-            case .denied, .restricted, .limited:
-                // 設定画面に促す
-                self.alertPresentationRelay.accept(self.createSettingsAlert())
-                break
-            case .notDetermined:
-                PHPhotoLibrary.requestAuthorization(for: .addOnly) { status in
-                    if status == .authorized {
-                        self.saveImage(image: image)
-                    }
-                }
-                break
-            @unknown default:
-                break
+            case .saved:
+                alertController = createAlert()
+            case .error(let error):
+                alertController = createAlert(message: error.localizedDescription)
+            case .goSettings:
+                alertController = createSettingsAlert()
             }
+            alertPresentationRelay.accept(alertController)
         }
     }
     
-    private func saveImage(image: UIImage) {
-        // アルバムに画像を保存する
-        PHPhotoLibrary.shared().performChanges {
-            PHAssetChangeRequest.creationRequestForAsset(from: image)
-        } completionHandler: { [weak self] success, error in
-            guard let self = self else { return }
-            // アラートをUIに表示する
-            DispatchQueue.main.async {
-                if success {
-                    self.alertPresentationRelay.accept(self.createAlert())
-                } else if let error = error {
-                    self.alertPresentationRelay.accept(self.createAlert(message: error.localizedDescription))
+    /// 画像がアルバムに正しく保存できたかを判断する
+    /// 保存処理をテストするためpublic
+    func checkStorageStatus(image: UIImage) async -> StorageStatus? {
+        var storageStatus:StorageStatus? = nil
+        let status = PHPhotoLibrary.authorizationStatus(for: .addOnly)
+        switch status {
+        case .authorized:
+            // 許可の場合に保存結果を取得
+            let error = await saveImage(image: image)
+            if let error = error {
+                storageStatus = .error(error)
+            } else {
+                storageStatus = .saved
+            }
+        case .denied, .restricted, .limited:
+            storageStatus = .goSettings
+        case .notDetermined:
+            // 許可の場合に保存結果を取得
+            let status = await PHPhotoLibrary.requestAuthorization(for: .addOnly)
+            if status == .authorized {
+                let error = await saveImage(image: image)
+                if let error = error {
+                    storageStatus = .error(error)
+                } else {
+                    storageStatus = .saved
                 }
             }
+        @unknown default:
+            break
         }
+        return storageStatus
+    }
+    
+    /// アルバムに保存する
+    private func saveImage(image: UIImage) async -> Error? {
+        var result: Error? = nil
+        do {
+            try await PHPhotoLibrary.shared().performChanges {
+                PHAssetChangeRequest.creationRequestForAsset(from: image)
+            }
+        } catch (let error) {
+            result = error
+        }
+        return result
     }
     
     private func createAlert(message: String? = nil) -> UIAlertController {
@@ -126,8 +149,8 @@ class QRCodeGeneratorViewModel: QRCodeGeneratorViewModelType {
         return alertController
     }
     
+    /// シェア画面を作成して表示する
     func shareImage(image: UIImage) {
-        // シェア画面を表示する
         let message = "[QRCodeSample] QRコードを読み込みグループを追加しましょう！"
         let linkMetaData = LPLinkMetadata()
         linkMetaData.title = message
@@ -147,10 +170,6 @@ class QRCodeGeneratorViewModel: QRCodeGeneratorViewModelType {
 extension QRCodeGeneratorViewModel: QRCodeGeneratorViewModelOutput {
     var qrCodeButtonIsEnabledDriver: Driver<Bool> {
         qrCodeButtonIsEnabledRelay.asDriver(onErrorDriveWith: .empty())
-    }
-    
-    var qrCodeImageDriver: Driver<UIImage> {
-        qrCodeImageRelay.asDriver(onErrorDriveWith: .empty())
     }
     
     var alertPresentationDriver: Driver<UIAlertController> {
@@ -182,9 +201,14 @@ class ShareActivityItemSource: NSObject, UIActivityItemSource {
     func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
         return nil
     }
+}
 
-    func activityViewControllerLinkMetadata(_ activityViewController: UIActivityViewController) -> LPLinkMetadata? {
-        return linkMetaData
-    }
+
+// MARK: - StorageStatus
+
+enum StorageStatus {
+    case saved
+    case error(Error)
+    case goSettings
 }
 

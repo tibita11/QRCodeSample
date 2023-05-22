@@ -26,6 +26,7 @@
             <subviews>
                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="7Pl-KY-Kuh">
                     <rect key="frame" x="71.666666666666686" y="301" width="250" height="250"/>
+                    <accessibility key="accessibilityConfiguration" identifier="qrCodeImageView"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="250" id="fhe-o1-lyF"/>
                         <constraint firstAttribute="height" constant="250" id="i9u-PD-KtQ"/>
@@ -51,6 +52,7 @@
                         </button>
                         <button opaque="NO" contentMode="scaleAspectFit" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2Gr-LV-L35">
                             <rect key="frame" x="146.66666666666666" y="0.0" width="106.33333333333334" height="40"/>
+                            <accessibility key="accessibilityConfiguration" identifier="shareButton"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="40" id="xCK-TD-qBi"/>
                             </constraints>
@@ -71,11 +73,13 @@
                     <subviews>
                         <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="H9F-PQ-NhU">
                             <rect key="frame" x="0.0" y="0.0" width="253" height="34"/>
+                            <accessibility key="accessibilityConfiguration" identifier="qrCodeValueTextField"/>
                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
                             <textInputTraits key="textInputTraits"/>
                         </textField>
                         <button opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0w0-2h-4GY">
                             <rect key="frame" x="59.666666666666657" y="64" width="134" height="34.333333333333343"/>
+                            <accessibility key="accessibilityConfiguration" identifier="qrCodeButton"/>
                             <state key="normal" title="Button"/>
                             <buttonConfiguration key="configuration" style="plain" title="QRコード生成"/>
                             <connections>
@@ -92,6 +96,7 @@
             </subviews>
             <viewLayoutGuide key="safeArea" id="fnl-2z-Ty3"/>
             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+            <accessibility key="accessibilityConfiguration" identifier="qrCodeGeneratorViewController"/>
             <constraints>
                 <constraint firstItem="yop-zN-kwp" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" constant="70" id="2Et-Jq-JOw"/>
                 <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="yop-zN-kwp" secondAttribute="trailing" constant="70" id="8WF-gv-FIu"/>
