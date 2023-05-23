@@ -10,7 +10,7 @@ import XCTest
 final class QRCodeSampleUITests: XCTestCase {
     
     let app = XCUIApplication()
-
+    
     override func setUp() {
         app.resetAuthorizationStatus(for: .photos)
         continueAfterFailure = false
@@ -21,35 +21,10 @@ final class QRCodeSampleUITests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
     
-    func testQRCodeGenerator() {
-        // タブ移動
-        let tabBar = app.tabBars.firstMatch
-        let tabIndex = 1
-        let tab = tabBar.buttons.element(boundBy: tabIndex)
-        tab.tap()
-        // 指定のViewControllerが表示されていること
-        let qrCodeGeneratorViewController = app.otherElements["qrCodeGeneratorViewController"]
-        XCTAssertTrue(qrCodeGeneratorViewController.waitForExistence(timeout: 5))
-        // UI要素の検索
-        let qrCodeValueTextField = app.textFields["qrCodeValueTextField"]
-        let qrCodeButton = app.buttons["qrCodeButton"]
+    func testShareImage() {
+        generateQRCode()
         let shareButton = app.buttons["shareButton"]
-        let saveButton = app.buttons["saveButton"]
-        // UI要素の検証
-        XCTAssert(qrCodeValueTextField.exists)
-        XCTAssert(qrCodeButton.exists)
-        XCTAssertFalse(qrCodeButton.isEnabled)
         XCTAssert(shareButton.exists)
-        XCTAssertFalse(shareButton.isEnabled)
-        XCTAssert(saveButton.exists)
-        XCTAssertFalse(saveButton.isEnabled)
-        // テキスト入力
-        qrCodeValueTextField.tap()
-        qrCodeValueTextField.typeText("テスト")
-        qrCodeValueTextField.typeText("\n")
-        // ボタンがタップ可能であること
-        XCTAssert(qrCodeButton.isEnabled)
-        qrCodeButton.tap()
         
         XCTContext.runActivity(named: "画像をシェアできること") { _ in
             // シェアボタンがタップ可能であること
@@ -60,6 +35,12 @@ final class QRCodeSampleUITests: XCTestCase {
             XCTAssert(activityListView.waitForExistence(timeout: 5))
             activityListView.buttons["Close"].tap()
         }
+    }
+    
+    func testSaveImageAtFiestTime() {
+        generateQRCode()
+        let saveButton = app.buttons["saveButton"]
+        XCTAssert(saveButton.exists)
         
         XCTContext.runActivity(named: "画像を保存できること") { _ in
             // 保存ボタンがタップ可能であること
@@ -75,7 +56,61 @@ final class QRCodeSampleUITests: XCTestCase {
             completionAlert.buttons["はい"].tap()
         }
     }
-
+    
+    func testTransitionToSettings() {
+        generateQRCode()
+        let saveButton = app.buttons["saveButton"]
+        XCTAssert(saveButton.exists)
+        
+        XCTContext.runActivity(named: "拒否の場合に設定画面へ遷移できること") { _ in
+            // 保存ボタンがタップ可能であること
+            XCTAssert(saveButton.isEnabled)
+            saveButton.tap()
+            // アルバムの使用を許可しないに変更する
+            let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
+            XCTAssert(springboard.waitForExistence(timeout: 5))
+            springboard.buttons["許可しない"].tap()
+            // 設定画面へ遷移
+            saveButton.tap()
+            let settingsAlert = app.alerts.firstMatch
+            XCTAssert(settingsAlert.waitForExistence(timeout: 5))
+            settingsAlert.buttons["設定"].tap()
+            // 設定画面が表示されていること
+            let settings = XCUIApplication(bundleIdentifier: "com.apple.Preferences")
+            XCTAssert(settings.navigationBars["QRCodeSample"].waitForExistence(timeout: 5))
+            // アプリへ戻る
+            let backButton = springboard.statusBars.buttons["QRCodeSampleへ戻る"]
+            XCTAssert(backButton.exists)
+            backButton.tap()
+            
+        }
+    }
+    
+    private func generateQRCode() {
+        // タブ移動
+        let tabBar = app.tabBars.firstMatch
+        let tabIndex = 1
+        let tab = tabBar.buttons.element(boundBy: tabIndex)
+        tab.tap()
+        // 指定のViewControllerが表示されていること
+        let qrCodeGeneratorViewController = app.otherElements["qrCodeGeneratorViewController"]
+        XCTAssertTrue(qrCodeGeneratorViewController.waitForExistence(timeout: 5))
+        // UI要素の検索
+        let qrCodeValueTextField = app.textFields["qrCodeValueTextField"]
+        let qrCodeButton = app.buttons["qrCodeButton"]
+        // UI要素の検証
+        XCTAssert(qrCodeValueTextField.exists)
+        XCTAssert(qrCodeButton.exists)
+        XCTAssertFalse(qrCodeButton.isEnabled)
+        // テキスト入力
+        qrCodeValueTextField.tap()
+        qrCodeValueTextField.typeText("テスト")
+        qrCodeValueTextField.typeText("\n")
+        // ボタンがタップ可能であること
+        XCTAssert(qrCodeButton.isEnabled)
+        qrCodeButton.tap()
+    }
+    
     func testLaunchPerformance() throws {
         if #available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 7.0, *) {
             // This measures how long it takes to launch your application.
