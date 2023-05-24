@@ -28,6 +28,9 @@
                             <rect key="frame" x="100" y="78.333333333333329" width="110.66666666666669" height="34.333333333333329"/>
                             <state key="normal" title="Button"/>
                             <buttonConfiguration key="configuration" style="plain" title="設定へ移動"/>
+                            <connections>
+                                <action selector="transitionToSettings:" destination="-1" eventType="touchUpInside" id="g40-94-4JB"/>
+                            </connections>
                         </button>
                     </subviews>
                 </stackView>

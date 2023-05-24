@@ -17,9 +17,19 @@ class SettingsView: UIView {
         super.init(coder: aDecoder)
         loadNib()
     }
+    
     func loadNib() {
         let view = Bundle.main.loadNibNamed("SettingsView", owner: self, options: nil)?.first as! UIView
         view.frame = self.bounds
         self.addSubview(view)
     }
+    
+    @IBAction func transitionToSettings(_ sender: Any) {
+       guard let settingsUrl = URL(string: UIApplication.openSettingsURLString),
+             UIApplication.shared.canOpenURL(settingsUrl) else {
+           return
+       }
+        UIApplication.shared.open(settingsUrl)
+    }
+    
 }
