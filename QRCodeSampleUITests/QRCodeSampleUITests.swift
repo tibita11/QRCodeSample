@@ -7,12 +7,13 @@
 
 import XCTest
 
-final class QRCodeSampleUITests: XCTestCase {
+final class QRCodeGeneratorUITests: XCTestCase {
     
     let app = XCUIApplication()
     
     override func setUp() {
         app.resetAuthorizationStatus(for: .photos)
+        app.resetAuthorizationStatus(for: .camera)
         continueAfterFailure = false
         app.launch()
     }
@@ -118,5 +119,66 @@ final class QRCodeSampleUITests: XCTestCase {
                 XCUIApplication().launch()
             }
         }
+    }
+}
+
+
+// MARK: - QRCodeReaderUITests
+
+final class QRCodeReaderUITests: XCTestCase {
+    
+    let app = XCUIApplication()
+    
+    override func setUp() {
+        app.resetAuthorizationStatus(for: .camera)
+        continueAfterFailure = false
+        app.launch()
+    }
+    
+    override func tearDownWithError() throws {
+        // Put teardown code here. This method is called after the invocation of each test method in the class.
+    }
+    
+    func testShowVideoPreview() {
+        XCTContext.runActivity(named: "アクセスを許可した場合に、プレビューのみが表示されていること") { _ in
+            moveToTargetTab()
+            // アクセス許可
+            let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
+            XCTAssert(springboard.waitForExistence(timeout: 5))
+            springboard.buttons["OK"].tap()
+            // プレビューが表示されていること
+            let preview = app.otherElements["preview"]
+            XCTAssert(preview.exists)
+            // 設定画面が表示されていないこと
+            let settingsView = app.otherElements["settingsView"]
+            XCTAssertFalse(settingsView.exists)
+        }
+    }
+    
+    func testShowSettingsView() {
+        XCTContext.runActivity(named: "アクセス拒否した場合に、設定画面が表示されていること") { _ in
+            moveToTargetTab()
+            // アクセス許可
+            let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
+            XCTAssert(springboard.waitForExistence(timeout: 5))
+            springboard.buttons["許可しない"].tap()
+            // プレビューが表示されていること
+            let preview = app.otherElements["preview"]
+            XCTAssert(preview.exists)
+            // 設定画面が表示されていること
+            let settingsView = app.otherElements["settingsView"]
+            XCTAssert(settingsView.exists)
+        }
+    }
+    
+    private func moveToTargetTab() {
+        // タブ移動
+        let tabBar = app.tabBars.firstMatch
+        let tabIndex = 2
+        let tab = tabBar.buttons.element(boundBy: tabIndex)
+        tab.tap()
+        // 指定のViewControllerが表示されていること
+        let qrCodeReaderViewController = app.otherElements["qrCodeReaderViewController"]
+        XCTAssert(qrCodeReaderViewController.waitForExistence(timeout: 5))
     }
 }

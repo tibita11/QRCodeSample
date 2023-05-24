@@ -34,6 +34,7 @@
             </subviews>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+            <accessibility key="accessibilityConfiguration" identifier="settingsView"/>
             <constraints>
                 <constraint firstItem="J2c-mZ-x1q" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="8ti-fh-w9m"/>
                 <constraint firstItem="J2c-mZ-x1q" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="vIh-qU-2Hh"/>

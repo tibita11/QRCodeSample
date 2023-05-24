@@ -40,10 +40,12 @@
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Za4-bU-CvV">
                     <rect key="frame" x="0.0" y="59" width="393" height="609"/>
                     <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    <accessibility key="accessibilityConfiguration" identifier="preview"/>
                 </view>
             </subviews>
             <viewLayoutGuide key="safeArea" id="fnl-2z-Ty3"/>
             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+            <accessibility key="accessibilityConfiguration" identifier="qrCodeReaderViewController"/>
             <constraints>
                 <constraint firstItem="38y-wo-cBh" firstAttribute="bottom" secondItem="fnl-2z-Ty3" secondAttribute="bottom" id="5pw-pb-e0o"/>
                 <constraint firstItem="Za4-bU-CvV" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" id="DnX-vj-Byp"/>

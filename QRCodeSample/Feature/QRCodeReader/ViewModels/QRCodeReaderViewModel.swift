@@ -12,7 +12,7 @@ import RxCocoa
 
 protocol QRCodeReaderViewModelOutput {
     var presentationDriver: Driver<String> { get }
-    var isAuthorized: Driver<Bool> { get }
+    var isAuthorizedDriver: Driver<Bool> { get }
 }
 
 protocol QRCodeReaderViewModelType {
@@ -137,7 +137,7 @@ extension QRCodeReaderViewModel: QRCodeReaderViewModelOutput {
         presentationPublishRelay.asDriver(onErrorDriveWith: .empty())
     }
     
-    var isAuthorized: Driver<Bool> {
+    var isAuthorizedDriver: Driver<Bool> {
         isAuthorizedBehaviorRelay.asDriver(onErrorDriveWith: .empty())
     }
     

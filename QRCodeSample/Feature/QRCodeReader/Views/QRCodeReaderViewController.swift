@@ -64,7 +64,7 @@ class QRCodeReaderViewController: UIViewController {
             })
             .disposed(by: disposeBag)
         // 許可状態に応じて画面の表示を切り替える
-        viewModel.output.isAuthorized
+        viewModel.output.isAuthorizedDriver
             .skip(1)
             .drive(onNext: { [weak self] bool in
                 guard let self = self else { return }
