@@ -29,9 +29,17 @@ class QRCodeReaderViewController: UIViewController {
         settingsView.frame = preview.bounds
         return settingsView
     }()
+    /// アルバムを表示するボタン
+    private lazy var albumButton: UIButton = {
+        let albumButton = UIButton()
+        albumButton.setImage(UIImage(systemName: "photo.on.rectangle"), for: .normal)
+        albumButton.backgroundColor = .systemGray6
+        albumButton.layer.cornerRadius = 5
+        return albumButton
+    }()
     
     
-    // MARK: - View Lify cycle
+    // MARK: - View Life Cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -56,8 +64,11 @@ class QRCodeReaderViewController: UIViewController {
     // MARK: - Action
     
     private func setUp() {
+        // ViewModel設定
+        let input = QRCodeReaderViewModelInput(albumButtonObaserver: albumButton.rx.tap.asObservable())
+        viewModel.setUp(input: input)
         // QRコード取得後の遷移処理
-        viewModel.output.presentationDriver
+        viewModel.output.transitionDriver
             .drive(onNext: { [weak self] stringValue in
                 let additionalVC = AdditionalViewController(value: stringValue)
                 self?.parent?.navigationController?.pushViewController(additionalVC, animated: true)
@@ -69,8 +80,24 @@ class QRCodeReaderViewController: UIViewController {
             .drive(onNext: { [weak self] bool in
                 guard let self = self else { return }
                 bool ? self.preview.layer.addSublayer(self.previewLayer) : self.preview.addSubview(settingsView)
+                // アルバム選択用のボタン設置
+                albumButton.frame = CGRect(origin: CGPoint(x: preview.bounds.width - 80, y: preview.bounds.height - 80), size: CGSize(width: 50, height: 50))
+                preview.addSubview(albumButton)
                 self.viewModel.startSession()
             })
             .disposed(by: disposeBag)
+        // アルバム表示
+        viewModel.output.phpickerPresentationDriver
+            .drive(onNext: { [weak self] phpickerViewController in
+                self?.present(phpickerViewController, animated: true)
+            })
+            .disposed(by: disposeBag)
+        // アラート表示
+        viewModel.output.errorAlertPresentationDriver
+            .drive(onNext: { [weak self] alertController in
+                self?.present(alertController, animated: true)
+            })
+            .disposed(by: disposeBag)
+        
     }
 }

@@ -9,14 +9,22 @@ import Foundation
 import AVFoundation
 import RxSwift
 import RxCocoa
+import PhotosUI
+
+struct QRCodeReaderViewModelInput {
+    let albumButtonObaserver: Observable<Void>
+}
 
 protocol QRCodeReaderViewModelOutput {
-    var presentationDriver: Driver<String> { get }
+    var transitionDriver: Driver<String> { get }
     var isAuthorizedDriver: Driver<Bool> { get }
+    var phpickerPresentationDriver: Driver<PHPickerViewController> { get }
+    var errorAlertPresentationDriver: Driver<UIAlertController> { get }
 }
 
 protocol QRCodeReaderViewModelType {
     var output: QRCodeReaderViewModelOutput! { get }
+    func setUp(input: QRCodeReaderViewModelInput)
 }
 
 class QRCodeReaderViewModel: NSObject, QRCodeReaderViewModelType {
@@ -26,8 +34,25 @@ class QRCodeReaderViewModel: NSObject, QRCodeReaderViewModelType {
     private let sessionQueue = DispatchQueue(label: "sessionQueue")
     private let metadataOutput = AVCaptureMetadataOutput()
     private let metadataObjectQueue = DispatchQueue(label: "metadataObjectQueue")
-    private let presentationPublishRelay = PublishRelay<String>()
+    private let transitionPublishRelay = PublishRelay<String>()
     private let isAuthorizedBehaviorRelay = BehaviorRelay(value: false)
+    private let phpickerPresentationPublishRelay = PublishRelay<PHPickerViewController>()
+    private let errorAlertPresentationPublishRelay = PublishRelay<UIAlertController>()
+    private let disposeBag = DisposeBag()
+    
+    func setUp(input: QRCodeReaderViewModelInput) {
+        // アルバム表示
+        input.albumButtonObaserver
+            .subscribe(onNext: { [weak self] in
+                var configuration = PHPickerConfiguration()
+                configuration.selectionLimit = 1
+                configuration.filter = .images
+                let picker = PHPickerViewController(configuration: configuration)
+                picker.delegate = self
+                self?.phpickerPresentationPublishRelay.accept(picker)
+            })
+            .disposed(by: disposeBag)
+    }
     
     func checkAuthorization() {
         Task {
@@ -109,6 +134,31 @@ class QRCodeReaderViewModel: NSObject, QRCodeReaderViewModelType {
         }
     }
     
+    /// 画像からQRコードを検出
+    /// - Returns: 取得した文字列
+    func detectQRCode(from image: UIImage) -> String? {
+        guard let ciImage = CIImage(image: image) else {
+            return nil
+        }
+        // 検出
+        let context = CIContext()
+        let detector = CIDetector(ofType: CIDetectorTypeQRCode, context: context, options: [CIDetectorAccuracy: CIDetectorAccuracyHigh])
+        let features = detector?.features(in: ciImage)
+        // 文字列取得
+        if let fisetFeature = features?.first as? CIQRCodeFeature {
+            return fisetFeature.messageString
+        }
+        return nil
+    }
+    
+    private func showErrorAlert() {
+        let alertController = UIAlertController(title: nil, message: "QRコードが検出できません。\n他の写真を選択してください。", preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "OK", style: .default)
+        alertController.addAction(okAction)
+        // UI表示
+        errorAlertPresentationPublishRelay.accept(alertController)
+    }
+    
 }
 
 
@@ -124,7 +174,36 @@ extension QRCodeReaderViewModel: AVCaptureMetadataOutputObjectsDelegate {
                 return
             }
             // 次の画面に遷移する
-            presentationPublishRelay.accept(stringValue)
+            transitionPublishRelay.accept(stringValue)
+        }
+    }
+}
+
+
+// MARK: - PHPickerViewControllerDelegate
+
+extension QRCodeReaderViewModel: PHPickerViewControllerDelegate {
+    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+        picker.dismiss(animated: true)
+        
+        let itemProvider = results.first?.itemProvider
+        guard let itemProvider = itemProvider, itemProvider.canLoadObject(ofClass: UIImage.self) else {
+            showErrorAlert()
+            return
+        }
+        // 画像取得
+        itemProvider.loadObject(ofClass: UIImage.self) { [weak self] image, error in
+            guard error == nil else{
+                self?.showErrorAlert()
+                return
+            }
+            // QRコード検出
+            guard let image = image, let uiImage = image as? UIImage, let message = self?.detectQRCode(from: uiImage) else {
+                self?.showErrorAlert()
+                return
+            }
+            // 文字列取得成功
+            self?.transitionPublishRelay.accept(message)
         }
     }
 }
@@ -133,12 +212,20 @@ extension QRCodeReaderViewModel: AVCaptureMetadataOutputObjectsDelegate {
 // MARK: - QRCodeReaderViewModelOutput
 
 extension QRCodeReaderViewModel: QRCodeReaderViewModelOutput {
-    var presentationDriver: Driver<String> {
-        presentationPublishRelay.asDriver(onErrorDriveWith: .empty())
+    var transitionDriver: Driver<String> {
+        transitionPublishRelay.asDriver(onErrorDriveWith: .empty())
     }
     
     var isAuthorizedDriver: Driver<Bool> {
         isAuthorizedBehaviorRelay.asDriver(onErrorDriveWith: .empty())
+    }
+    
+    var phpickerPresentationDriver: Driver<PHPickerViewController> {
+        phpickerPresentationPublishRelay.asDriver(onErrorDriveWith: .empty())
+    }
+    
+    var errorAlertPresentationDriver: Driver<UIAlertController> {
+        errorAlertPresentationPublishRelay.asDriver(onErrorDriveWith: .empty())
     }
     
 }
