@@ -7,6 +7,7 @@ target 'QRCodeSample' do
   
   pod 'RxSwift'
   pod 'RxCocoa'
+  pod 'RealmSwift'
 
   # Pods for QRCodeSample
 

@@ -70,7 +70,7 @@ class QRCodeReaderViewController: UIViewController {
         // QRコード取得後の遷移処理
         viewModel.output.transitionDriver
             .drive(onNext: { [weak self] stringValue in
-                let additionalVC = AdditionalViewController(value: stringValue)
+                let additionalVC = AdditionViewController(value: stringValue)
                 self?.parent?.navigationController?.pushViewController(additionalVC, animated: true)
             })
             .disposed(by: disposeBag)
