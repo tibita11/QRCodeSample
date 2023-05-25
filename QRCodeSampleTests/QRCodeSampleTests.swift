@@ -9,7 +9,7 @@ import XCTest
 import Photos
 @testable import QRCodeSample
 
-final class QRCodeSampleTests: XCTestCase {
+final class QRCodeGeneratorTests: XCTestCase {
 
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -20,17 +20,10 @@ final class QRCodeSampleTests: XCTestCase {
     }
     
     func testGenerateQRCode() {
-        let image = QRCodeGeneratorViewModel().generateQRCode(value: "テスト")
-        XCTAssertNotNil(image)
-    }
-    
-
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-        // Any test you write for XCTest can be annotated as throws and async.
-        // Mark your test throws to produce an unexpected failure when your test encounters an uncaught error.
-        // Mark your test async to allow awaiting for asynchronous code to complete. Check the results with assertions afterwards.
+        XCTContext.runActivity(named: "QRコードが作成されること") { _ in
+            let image = QRCodeGeneratorViewModel().generateQRCode(value: "テスト")
+            XCTAssertNotNil(image)
+        }
     }
 
     func testPerformanceExample() throws {
@@ -39,5 +32,26 @@ final class QRCodeSampleTests: XCTestCase {
             // Put the code you want to measure the time of here.
         }
     }
+}
 
+
+// MARK: - QRCodeReaderTests
+
+final class QRCodeReaderTests: XCTestCase {
+    
+    func testDetectQRCode() {
+        let qrCodeReaderViewModel = QRCodeReaderViewModel()
+        
+        XCTContext.runActivity(named: "QRコードが検出できること") { _ in
+            guard let testImage = UIImage(named: "QRCodeTestImage") else { return }
+            let message = qrCodeReaderViewModel.detectQRCode(from: testImage)
+            XCTAssertEqual(message, "テスト")
+        }
+        
+        XCTContext.runActivity(named: "QRコードが検出できないこと") { _ in
+            guard let testImage = UIImage(systemName: "person.fill") else { return }
+            let message = qrCodeReaderViewModel.detectQRCode(from: testImage)
+            XCTAssertNil(message)
+        }
+    }
 }
