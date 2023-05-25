@@ -24,11 +24,9 @@ class DataStorage {
             try realm.write {
                 if let itemList = realm.objects(ItemList.self).first {
                     // そのまま追加
-                    print("Listがあるよ")
                     itemList.list.append(item)
                 } else {
                     // Listを作成して追加
-                    print("Listがないよ")
                     let itemList = ItemList()
                     itemList.list.append(item)
                     realm.add(itemList)
