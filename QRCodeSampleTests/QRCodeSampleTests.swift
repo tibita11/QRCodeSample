@@ -56,8 +56,12 @@ final class QRCodeAdditionTests: XCTestCase {
     }
     
     func testSave() {
-        XCTContext.runActivity(named: "Listが存在しない場合に新規Listを作成し、追加されること") { _ in
+        XCTContext.runActivity(named: "初回保存の場合") { _ in
             dataStorage.save(value: "テスト1")
+            // Itemに追加されていること
+            let itemCount = realm.objects(Item.self).count
+            XCTAssertEqual(itemCount, 1)
+            // ItemsListに追加されていること
             guard let list = realm.objects(ItemList.self).first?.list, let firstItem = list.first else {
                 XCTFail("DBへの登録が正しくありません。")
                 return
@@ -66,8 +70,12 @@ final class QRCodeAdditionTests: XCTestCase {
             XCTAssertEqual(firstItem.title, "テスト1")
         }
         
-        XCTContext.runActivity(named: "Listが存在する場合に新規データがlistに追加されること") { _ in
+        XCTContext.runActivity(named: "2回目保存の場合") { _ in
             dataStorage.save(value: "テスト2")
+            // Itemに追加されていること
+            let itemCount = realm.objects(Item.self).count
+            XCTAssertEqual(itemCount, 2)
+            // ItemsListに追加されていること
             guard let list = realm.objects(ItemList.self).first?.list, let firstItem = list.first, let lastItem = list.last else {
                 XCTFail("DBへの登録が正しくありません。")
                 return
