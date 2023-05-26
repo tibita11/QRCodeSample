@@ -86,3 +86,35 @@ final class QRCodeAdditionTests: XCTestCase {
         }
     }
 }
+
+final class QRCodeListTests: XCTestCase {
+    private var dataStorage: DataStorage!
+    private var realm: Realm!
+    
+    override func setUpWithError() throws {
+        Realm.Configuration.defaultConfiguration.inMemoryIdentifier = self.name
+        realm = try! Realm()
+        
+        try realm.write {
+            let itemList = ItemList()
+            for number in 1...3 {
+                let item = Item()
+                item.title = "テスト\(number)"
+                itemList.list.append(item)
+            }
+            realm.add(itemList)
+        }
+        dataStorage = DataStorage(realm: realm)
+    }
+    
+    func testDelete() {
+        XCTContext.runActivity(named: "ListとListItemのカウント数が一致していること") { _ in
+            dataStorage.delete(at: 0)
+            let item = realm.objects(Item.self)
+            let itemList = realm.objects(ItemList.self).first!.list
+            XCTAssertEqual(item.count, itemList.count)
+        }
+    }
+    
+    
+}
