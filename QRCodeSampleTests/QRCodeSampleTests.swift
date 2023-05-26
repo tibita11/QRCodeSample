@@ -116,5 +116,13 @@ final class QRCodeListTests: XCTestCase {
         }
     }
     
+    func testMove() {
+        XCTContext.runActivity(named: "並び順が変更されていること") { _ in
+            dataStorage.move(from: 0, to: 2)
+            let itemList = realm.objects(ItemList.self).first!.list
+            XCTAssertEqual(itemList[2].title, "テスト1")
+        }
+    }
+    
     
 }
