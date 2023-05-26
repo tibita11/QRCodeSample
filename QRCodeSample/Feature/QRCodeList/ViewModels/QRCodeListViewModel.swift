@@ -12,7 +12,7 @@ import RealmSwift
 import RxRealm
 
 protocol QRCodeListViewModelOutput {
-    var listObserver: Observable<List<Item>> { get }
+    var listObserver: Observable<[SectionOfItemData]> { get }
 }
 
 protocol QRCodeListViewModelType {
@@ -22,7 +22,7 @@ protocol QRCodeListViewModelType {
 class QRCodeListViewModel: QRCodeListViewModelType {
     var output: QRCodeListViewModelOutput! { self }
     
-    private let listPublishRelay = PublishRelay<List<Item>>()
+    private let listPublishRelay = PublishRelay<[SectionOfItemData]>()
     private let disposeBag = DisposeBag()
     
     func setUp() {
@@ -31,11 +31,12 @@ class QRCodeListViewModel: QRCodeListViewModelType {
         // データ取得
         Observable.array(from: itemList)
             .subscribe(onNext: { [weak self] itemList in
-                guard let list = itemList.first?.list else {
+                guard let itemList = itemList.first?.list else {
                     return
                 }
-                // UI反映
-                self?.listPublishRelay.accept(list)
+                let list: [ItemData] = itemList.map({ ItemData(title: $0.title) })
+                let section = SectionOfItemData(items: list)
+                self?.listPublishRelay.accept([section])
             })
             .disposed(by: disposeBag)
     }
@@ -45,7 +46,7 @@ class QRCodeListViewModel: QRCodeListViewModelType {
 // MARK: - QRCodeListViewModelOutput
 
 extension QRCodeListViewModel: QRCodeListViewModelOutput {
-    var listObserver: Observable<List<Item>> {
+    var listObserver: Observable<[SectionOfItemData]> {
         listPublishRelay.asObservable()
     }
 }
