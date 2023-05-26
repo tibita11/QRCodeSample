@@ -13,6 +13,11 @@ import RxDataSources
 class QRCodeListViewController: UIViewController {
 
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var editButton: UIButton! {
+        didSet {
+            editButton.layer.cornerRadius = 15
+        }
+    }
     private let viewModel = QRCodeListViewModel()
     private let disposeBag = DisposeBag()
     let dataSources = RxTableViewSectionedReloadDataSource<SectionOfItemData>(configureCell: { dataSource, tableView, indexPath, item in
@@ -61,4 +66,9 @@ class QRCodeListViewController: UIViewController {
         // DB取得が流れてしまうためバインド後に処理する
         viewModel.setUp()
     }
+    
+    @IBAction func tapEditButton(_ sender: Any) {
+        tableView.isEditing = !tableView.isEditing
+    }
+    
 }

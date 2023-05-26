@@ -11,6 +11,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="QRCodeListViewController" customModule="QRCodeSample" customModuleProvider="target">
             <connections>
+                <outlet property="editButton" destination="8Jo-fY-AiY" id="KYg-vb-A2C"/>
                 <outlet property="tableView" destination="udw-XL-gxk" id="lOH-tG-arM"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
@@ -21,22 +22,43 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" allowsSelection="NO" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="udw-XL-gxk">
-                    <rect key="frame" x="0.0" y="59" width="393" height="759"/>
+                    <rect key="frame" x="0.0" y="109" width="393" height="709"/>
                     <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                 </tableView>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8Jo-fY-AiY">
+                    <rect key="frame" x="283" y="64" width="100" height="30"/>
+                    <color key="backgroundColor" systemColor="linkColor"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="30" id="XJI-bf-PpI"/>
+                        <constraint firstAttribute="width" constant="100" id="ihm-aS-vug"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                    <state key="normal" title="並び替え・削除">
+                        <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    </state>
+                    <connections>
+                        <action selector="tapEditButton:" destination="-1" eventType="touchUpInside" id="gX9-SB-grB"/>
+                    </connections>
+                </button>
             </subviews>
             <viewLayoutGuide key="safeArea" id="fnl-2z-Ty3"/>
             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
             <constraints>
-                <constraint firstItem="udw-XL-gxk" firstAttribute="top" secondItem="fnl-2z-Ty3" secondAttribute="top" id="6qe-Qe-GTT"/>
+                <constraint firstItem="8Jo-fY-AiY" firstAttribute="top" secondItem="fnl-2z-Ty3" secondAttribute="top" constant="5" id="0HK-OH-bsW"/>
                 <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="udw-XL-gxk" secondAttribute="trailing" id="8vC-8h-8Rd"/>
+                <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="8Jo-fY-AiY" secondAttribute="trailing" constant="10" id="PTv-lX-ATj"/>
                 <constraint firstItem="fnl-2z-Ty3" firstAttribute="bottom" secondItem="udw-XL-gxk" secondAttribute="bottom" id="Uuy-HF-Hcw"/>
+                <constraint firstItem="udw-XL-gxk" firstAttribute="top" secondItem="8Jo-fY-AiY" secondAttribute="bottom" constant="15" id="apY-5l-s9e"/>
                 <constraint firstItem="udw-XL-gxk" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" id="goe-Lx-40c"/>
             </constraints>
-            <point key="canvasLocation" x="132" y="-11"/>
+            <point key="canvasLocation" x="130.53435114503816" y="-11.267605633802818"/>
         </view>
     </objects>
     <resources>
+        <systemColor name="linkColor">
+            <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
