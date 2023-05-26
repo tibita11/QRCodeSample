@@ -49,4 +49,18 @@ class DataStorage {
             }
         }
     }
+    
+    func move(from sourceIndex: Int, to destinationIndex: Int) {
+        if let list = realm.objects(ItemList.self).first?.list {
+            let item = list[sourceIndex]
+            do {
+                try realm.write {
+                    list.remove(at: sourceIndex)
+                    list.insert(item, at: destinationIndex)
+                }
+            } catch (let error) {
+                print("Realm並び替え失敗: \(error.localizedDescription)")
+            }
+        }
+    }
 }

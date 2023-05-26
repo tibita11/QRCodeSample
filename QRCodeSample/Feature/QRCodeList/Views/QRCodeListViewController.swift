@@ -23,6 +23,8 @@ class QRCodeListViewController: UIViewController {
         return cell
     }, canEditRowAtIndexPath: { dataSource, indexPath in
         return true
+    }, canMoveRowAtIndexPath: { dataSource, indexPath in
+        return true
     })
 
     
@@ -48,6 +50,12 @@ class QRCodeListViewController: UIViewController {
         tableView.rx.itemDeleted
             .subscribe(onNext: { [weak self] indexPath in
                 self?.viewModel.delete(at: indexPath.row)
+            })
+            .disposed(by: disposeBag)
+        // 移動
+        tableView.rx.itemMoved
+            .subscribe(onNext: { [weak self] sourceIndexPath, destinationIndexPath in
+                self?.viewModel.move(from: sourceIndexPath.row, to: destinationIndexPath.row)
             })
             .disposed(by: disposeBag)
         // DB取得が流れてしまうためバインド後に処理する

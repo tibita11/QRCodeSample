@@ -24,9 +24,14 @@ class QRCodeListViewModel: QRCodeListViewModelType {
     
     private let listPublishRelay = PublishRelay<[SectionOfItemData]>()
     private let disposeBag = DisposeBag()
+    private var realm: Realm!
+    private lazy var dataSotrage: DataStorage = {
+        let dataSotrage = DataStorage(realm: self.realm)
+        return dataSotrage
+    }()
     
     func setUp() {
-        let realm = try! Realm()
+        realm = try! Realm()
         let itemList = realm.objects(ItemList.self)
         // データ取得
         Observable.array(from: itemList)
@@ -42,7 +47,11 @@ class QRCodeListViewModel: QRCodeListViewModelType {
     }
     
     func delete(at index: Int) {
-        DataStorage(realm: try! Realm()).delete(at: index)
+        dataSotrage.delete(at: index)
+    }
+    
+    func move(from sourceIndex: Int, to destinationIndex: Int) {
+        dataSotrage.move(from: sourceIndex, to: destinationIndex)
     }
 }
 
