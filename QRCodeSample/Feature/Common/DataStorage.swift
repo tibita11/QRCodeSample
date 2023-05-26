@@ -36,4 +36,17 @@ class DataStorage {
             print("Realm保存失敗: \(error.localizedDescription)")
         }
     }
+    
+    func delete(at index: Int) {
+        if let list = realm.objects(ItemList.self).first?.list {
+            let item = list[index]
+            do {
+                try realm.write {
+                    realm.delete(item)
+                }
+            } catch (let error) {
+                print("Realm削除失敗: \(error.localizedDescription)")
+            }
+        }
+    }
 }

@@ -44,6 +44,12 @@ class QRCodeListViewController: UIViewController {
         viewModel.output.listObserver
             .bind(to: tableView.rx.items(dataSource: dataSources))
             .disposed(by: disposeBag)
+        // 削除
+        tableView.rx.itemDeleted
+            .subscribe(onNext: { [weak self] indexPath in
+                self?.viewModel.delete(at: indexPath.row)
+            })
+            .disposed(by: disposeBag)
         // DB取得が流れてしまうためバインド後に処理する
         viewModel.setUp()
     }

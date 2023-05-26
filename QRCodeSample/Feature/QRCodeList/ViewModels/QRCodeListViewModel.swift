@@ -40,6 +40,10 @@ class QRCodeListViewModel: QRCodeListViewModelType {
             })
             .disposed(by: disposeBag)
     }
+    
+    func delete(at index: Int) {
+        DataStorage(realm: try! Realm()).delete(at: index)
+    }
 }
 
 
